@@ -2,6 +2,7 @@ import datetime
 
 from django.db import models
 from django.utils import timezone
+from django.contrib import admin
 
 class Question(models.Model):
     question_text = models.CharField(max_length=200)
@@ -10,10 +11,16 @@ class Question(models.Model):
     def __str__(self):
         return self.question_text
 
-    def was_published_recently(self):
-        return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+    # @admin.display(
+    #     boolean=True,
+    #     ordering='pub_date',
+    #     description='Published recently?',
+    # )
 
-    # (현재시각 - 하루전날 시각 = 어제 시각) 어제 이후에 발행된 데이터 리턴
+    def was_published_recently(self):
+        now = timezone.now()
+        return now - datetime.timedelta(days=1) <= self.pub_date <= now
+
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
